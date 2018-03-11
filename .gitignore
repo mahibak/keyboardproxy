@@ -1,0 +1,8 @@
+
+*.xml
+
+\.mxproject
+
+Debug/
+
+*.scratch
