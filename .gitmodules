@@ -1,0 +1,3 @@
+[submodule "common-library-cpp"]
+	path = common-library-cpp
+	url = https://bitbucket.org/ararobotique/common-library-cpp

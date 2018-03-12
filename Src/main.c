@@ -53,13 +53,22 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "usbd_hid.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+
+uint8_t buffer[9];
+void keyboard_write(uint8_t char1){
+    buffer[2]=char1;
+    USBD_HID_SendReport(&hUsbDeviceFS,buffer,sizeof(buffer));
+    HAL_Delay(200);
+}
+
+
 
 /* USER CODE END PV */
 
@@ -85,7 +94,6 @@ int main(void)
   /* MCU Configuration----------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -93,7 +101,6 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -103,6 +110,8 @@ int main(void)
   MX_USB_DEVICE_Init();
 
   /* USER CODE BEGIN 2 */
+  extern void main_keyboard_proxy();
+  main_keyboard_proxy();
 
   /* USER CODE END 2 */
 
