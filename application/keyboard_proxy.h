@@ -70,7 +70,7 @@ public:
         HAL_Delay(10000);
         while (true)
         {
-            pressKey(KEY_D);
+            //pressKey(KEY_D);
             Clock::monotonic->delayMilliseconds(1000);
         }
 
