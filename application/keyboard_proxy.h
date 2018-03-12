@@ -23,6 +23,10 @@ public:
     {
         extern USBD_HandleTypeDef hUsbDeviceFS;
         USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)this, 8);
+        while(((USBD_HID_HandleTypeDef*)hUsbDeviceFS.pClassData)->state == HID_BUSY)
+        {
+
+        }
     }
 
     void clear()
@@ -38,15 +42,15 @@ public:
     }
 }__packed;
 
+static KeyboardReport report;
+
 class KeyboardProxy
 {
     void pressKey(uint8_t scanCode)
     {
-        KeyboardReport report;
         report.clear();
-        report.keys[0] = 4;
+        report.keys[0] = scanCode;
         report.send();
-        HAL_Delay(100);
         report.clear();
         report.send();
     }
@@ -62,7 +66,6 @@ public:
         static Stm32Led led(LED_GPIO_Port, LED_Pin);
         static SoftwarePwmLed softwarePwmLed(&led, 100);
         scheduler.spawnProcess(&softwarePwmLed);
-
 
         HAL_Delay(10000);
         while (true)

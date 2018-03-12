@@ -94,6 +94,7 @@ int main(void)
   /* MCU Configuration----------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -101,6 +102,7 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
+
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -120,10 +122,7 @@ int main(void)
   while (1)
   {
   /* USER CODE END WHILE */
-      HAL_Delay(200);
-      HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 1);
-      HAL_Delay(100);
-      HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 0);
+
   /* USER CODE BEGIN 3 */
 
   }
