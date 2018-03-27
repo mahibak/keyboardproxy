@@ -180,7 +180,7 @@ __ALIGN_BEGIN static uint8_t USBD_HID_CfgDesc[USB_HID_CONFIG_DESC_SIZ]  __ALIGN_
   0x03,          /*bmAttributes: Interrupt endpoint*/
   HID_EPIN_SIZE, /*wMaxPacketSize: 4 Byte max */
   0x00,
-  HID_FS_BINTERVAL,          /*bInterval: Polling Interval (10 ms)*/
+  1,          /*bInterval: Polling Interval (10 ms)*/
   /* 34 */
 } ;
 
