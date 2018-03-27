@@ -1,16 +1,23 @@
 #pragma once
 
+#include <Callbacks.h>
 #include <HAL/Led.h>
 #include <main.h>
-#include <scan_codes.h>
-#include <stm32f1xx_hal.h>
+#include <STM32/stm32f_hal.h>
+#include <stm32f1xx_hal_gpio.h>
 #include <stdint.h>
 #include <Scheduling/Scheduler.h>
-#include <STM32/Stm32HalClock.h>
+#include <STM32/stm32_pin.h>
 #include <STM32/Stm32Led.h>
 #include <STM32/Stm32Processor.h>
+#include <STM32/Stm32TimerClock.h>
+#include <tim.h>
+#include <Time/Clock.h>
 #include <usbd_def.h>
 #include <usbd_hid.h>
+
+#include "../Src/ps2.h"
+#include "../Src/ps2_keyboard.h"
 
 class KeyboardReport
 {
@@ -23,7 +30,7 @@ public:
     {
         extern USBD_HandleTypeDef hUsbDeviceFS;
         USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)this, 8);
-        while(((USBD_HID_HandleTypeDef*)hUsbDeviceFS.pClassData)->state == HID_BUSY)
+        while (((USBD_HID_HandleTypeDef*)hUsbDeviceFS.pClassData)->state == HID_BUSY)
         {
 
         }
@@ -58,7 +65,7 @@ class KeyboardProxy
 public:
     KeyboardProxy()
     {
-        static Stm32HalClock stm32HalClock;
+        static Stm32TimerClock stm32HalClock(&htim1);
         Clock::monotonic = &stm32HalClock;
         static Scheduler scheduler;
         static Stm32Processor stm32Processor;
@@ -67,7 +74,12 @@ public:
         static SoftwarePwmLed softwarePwmLed(&led, 100);
         scheduler.spawnProcess(&softwarePwmLed);
 
-        HAL_Delay(10000);
+        static Stm32Pin clock(GPIOB, GPIO_PIN_4);
+        static Stm32Pin data(GPIOB, GPIO_PIN_6);
+
+        static PS2 ps2(&clock, &data);
+        static Ps2Keyboard ps2Keyboard(&ps2);
+
         while (true)
         {
             //pressKey(KEY_D);
