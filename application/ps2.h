@@ -1,11 +1,13 @@
 #pragma once
 
 #include <Callbacks.h>
+#include <Containers/InplaceQueue.h>
 #include <stdint.h>
+#include <Scheduling/Process.h>
 #include <STM32/stm32_pin.h>
 #include <Time/Clock.h>
 
-class PS2: CallbackListener<Stm32Pin::ExternalInterruptArgs*>
+class PS2: CallbackListener<Stm32Pin::ExternalInterruptArgs*>, public Process
 {
 private:
     uint8_t clockEdges = 0;
@@ -37,10 +39,23 @@ public:
 
     uint64_t us = 0;
 
+    InplaceQueue<uint8_t, 128> rxQueue;
+
+    void loop() override
+    {
+        ByteReceivedArgs a;
+
+        while(!rxQueue.isEmpty())
+        {
+            a.byte = rxQueue.pull();
+            onByteReceived.emit(&a);
+        }
+    }
+
     void onCallback(Stm32Pin::ExternalInterruptArgs* args) override
     {
         uint64_t now = Clock::monotonic->microseconds();
-        if((now - us) > 1000)
+        if ((now - us) > 1000)
             clockEdges = 0;
         us = now;
 
@@ -80,11 +95,7 @@ public:
             stopBit = data->high();
             clockEdges = 0;
             if (stopBit == 1 && startBit == 0)
-            {
-                ByteReceivedArgs a;
-                a.byte = dataByte;
-                onByteReceived.emit(&a);
-            }
+                rxQueue.push(dataByte);
             dataByte = 0;
             break;
         default:
